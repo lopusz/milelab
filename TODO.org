@@ -1,0 +1,5 @@
+* Issues & ideas
+  + *[topics]* Possibly rewrite =get-topic=, modelling it after
+    =ParallelTopicModell.printTypeTopicCounts()= method
+
+* Done
