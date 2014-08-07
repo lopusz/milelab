@@ -27,10 +27,14 @@
 (defn get-topic-only-top-words [ parallel-topic-model topic-id n]
   (. parallel-topic-model getTopicOnlyTopWords topic-id n))
 
-(defn get-topic-only-exceeding-prob-words [ parallel-topic-model topic-id min-prob]
+(defn get-topic-only-exceeding-prob-words
+  [ parallel-topic-model topic-id min-prob]
   (. parallel-topic-model getTopicOnlyExceedingProbWords topic-id min-prob))
 
-(defn run-estimate-topcs []
+(defn get-docs-topics [ parallel-topic-model n min-prob ]
+  (. parallel-topic-model getDocsTopics n min-prob))
+
+(defn run-estimate-topics [ ]
   (let [
          names [ 1 2 3 4 ]
          data

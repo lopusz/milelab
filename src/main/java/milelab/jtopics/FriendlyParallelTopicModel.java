@@ -1,5 +1,6 @@
 package milelab.jtopics;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import cc.mallet.topics.ParallelTopicModel;
 import cc.mallet.types.LabelAlphabet;
 import cc.mallet.types.FeatureSequence;
 import cc.mallet.types.LabelSequence;
+import cc.mallet.types.IDSorter;
 
 
 public class FriendlyParallelTopicModel extends ParallelTopicModel {
@@ -89,7 +91,7 @@ public class FriendlyParallelTopicModel extends ParallelTopicModel {
         return wordProb;
     }
 
-    public Map<String,Double> getTopicOnlyTopWords(int topicId,int n) {
+    public Map<String,Double> getTopicOnlyTopWords(int topicId, int n) {
         Map<String,Integer> wordCount=calcTopicWordCount(topicId);
 
         int total=calcTopicTotalCount(wordCount);
@@ -128,5 +130,62 @@ public class FriendlyParallelTopicModel extends ParallelTopicModel {
                 break;
         }
         return wordProb;
+    }
+
+    public Map<Object,Map<Long,Double>> getDocsTopics (int n, double minProb) {
+
+  	int docLen;
+	int[] topicCounts = new int[ numTopics ];
+
+	IDSorter[] sortedTopics = new IDSorter[ numTopics ];
+	for (int topic = 0; topic < numTopics; topic++) {
+	   // Initialize the sorters with dummy values
+	   sortedTopics[topic] = new IDSorter(topic, topic);
+	}
+
+	if (n < 0 || n > numTopics) {
+            n = numTopics;
+	}
+
+        Map<Object,Map<Long,Double>>
+            res = new LinkedHashMap<Object,Map<Long,Double>>();
+
+	for (int doc = 0; doc < data.size(); doc++) {
+
+	    LabelSequence topicSequence = (LabelSequence) data.get(doc).topicSequence;
+	    int[] currentDocTopics = topicSequence.getFeatures();
+            Object docName;
+	    if (data.get(doc).instance.getName() != null) {
+                docName=data.get(doc).instance.getName();
+	    }
+	    else {
+		    docName="no-name";
+	    }
+
+	    docLen = currentDocTopics.length;
+
+	    // Count up the tokens
+	    for (int token=0; token < docLen; token++) {
+                topicCounts[ currentDocTopics[token] ]++;
+	    }
+
+	    // And normalize
+	    for (int topic = 0; topic < numTopics; topic++) {
+		 sortedTopics[topic].set(topic, (alpha[topic] + topicCounts[topic]) / (docLen + alphaSum) );
+	    }
+
+	    Arrays.sort(sortedTopics);
+
+            Map<Long,Double> docRes=new LinkedHashMap<Long,Double>();
+
+	    for (int i = 0; i < n; i++) {
+                if (sortedTopics[i].getWeight() < minProb) { break; }
+                docRes.put(new Long(sortedTopics[i].getID()),sortedTopics[i].getWeight());
+	    }
+            res.put(docName,docRes);
+
+	    Arrays.fill(topicCounts, 0);
+        }
+        return res;
     }
 }
