@@ -33,16 +33,3 @@
 
 (defn get-docs-topics [ parallel-topic-model n min-prob ]
   (. parallel-topic-model getDocsTopics n min-prob))
-
-(defn run-estimate-topics [ ]
-  (let [
-         names [ 1 2 3 4 ]
-         data
-            [ [ "Jane" "lives" "in" "Warsaw" ]
-              [ "Warsaw" "is" "a" "beautiful" "city" ]
-              [ "Sister" "of" "Jane" "lives" "in" "LA" ]
-              [ "LA" "is" "far" "away" "from" "Warsaw"] ]
-          instance-list (create-instance-list names data)
-          ptm (estimate-topics instance-list 2)
-        ]
-    ptm))

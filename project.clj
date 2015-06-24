@@ -9,7 +9,6 @@
   :aot :all
   :omit-source true
 
-  :main milelab.core
   ;; Options used by Java
   ;;; run with assertions enabled
   :jvm-opts ["-ea"]

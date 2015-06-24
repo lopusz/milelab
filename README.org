@@ -1,7 +1,43 @@
 * milelab
   MachIne LEarning Lab
 
-* License
+  Currently, this library contains only a wrapper to LDA (Latent Dirichlet
+  Allocation) computed by the [[http://mallet.cs.umass.edu][Mallet]] package.
+** Examples
+
+   Dead simple analysis with two topics:
+
+   #+BEGIN_SRC clojure :tangle test-lda.clj
+   (require '[clojure.pprint :as pp])
+   (require '[ milelab.instances :as mi])
+   (require '[ milelab.topics :as mt])
+
+   (def ptm
+     (let [
+            num-topics 2
+            doc-names [ 1 2 3 4 ]
+            doc-data
+            [ [ "Jane" "lives" "in" "Warsaw" ]
+              [ "Warsaw" "is" "a" "beautiful" "city" ]
+              [ "Sister" "of" "Jane" "lives" "in" "LA" ]
+              [ "LA" "is" "far" "away" "from" "Warsaw"] ]
+            instance-list (mi/create-instance-list doc-names doc-data)
+           ]
+         (mt/estimate-topics instance-list num-topics)))
+   (pp/pprint (mt/get-topic ptm 0))
+   (pp/pprint (mt/get-topic ptm 1))
+   #+END_SRC
+
+   Note that ~get-topic~ returns java class ~LinkedHashMap~ mapping word to
+   its probability in a given topic. This Java class guarantees that iteration
+   order through words with decreasing probability. You can convert this
+   ~LinkedHashMap~ to Clojure immutable hash map, however, this looses the
+   iteration order guarantee.
+
+   #+BEGIN_SRC clojure :tangle test-lda.clj
+   (pp/pprint (into (hash-map) (mt/get-topic ptm 0)))
+   #+END_SRC
+
+** License
 
   Distributed under the Eclipse Public License, the same as Clojure.
-
