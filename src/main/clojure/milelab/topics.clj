@@ -4,9 +4,10 @@
 
 (defn estimate-topics
   [ instance-list num-topics
-    & { :keys [ alpha-sum beta num-threads num-iter ]
+    & { :keys [ alpha-sum beta random-seed num-threads num-iter ]
         :or { alpha-sum nil
               beta nil
+              random-seed nil
               num-threads (.availableProcessors (Runtime/getRuntime))
               num-iter 100 }}]
   (let [
@@ -14,6 +15,9 @@
            (if (and alpha-sum  beta)
              (FriendlyParallelTopicModel. num-topics alpha-sum beta)
              (FriendlyParallelTopicModel. num-topics))
+         _
+            (when random-seed
+                (. parallel-topic-model setRandomSeed random-seed))
         ]
     (doto parallel-topic-model
       (.addInstances instance-list)
